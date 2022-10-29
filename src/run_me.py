@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pathlib import Path
+import seaborn as sns
 import sklearn.metrics
+from pathlib import Path
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LogisticRegression
 
@@ -69,6 +70,12 @@ def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegre
     return clf
 
 
+def savefig(fname: str) -> None:
+    save_path = Path(Path(__file__).parents[1], 'figures', fname)
+    print(f'Saving {save_path}\n')
+    plt.savefig(save_path)
+
+
 def prob_1a() -> None:
     """The solution to problem 1a."""
     s = '----------\n' \
@@ -86,19 +93,21 @@ def prob_1a() -> None:
 
 
 def prob_2a():
-    s = '----------\n' \
-    'Problem 2a\n' \
-    'The function train_logistic_regression() takes two pandas DataFrames, one for predictors \n' \
-    'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
-    'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
-    'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
-    'the output I selected.)'
+    s = '' \
+      '----------\n' \
+      'Problem 2a\n' \
+      'The function train_logistic_regression() takes two pandas DataFrames, one for predictors \n' \
+      'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
+      'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
+      'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
+      'the output I selected.)'
     print(s)
 
 
 def prob_2b():
     print('----------\n')
     print('Problem 2b\n')
+
     # get the PS3-2 dataset
     df_train = get_data(2, test=False)
 
@@ -113,13 +122,26 @@ def prob_2b():
     weight_vector = np.concatenate((intercept_ndarray, coef_ndarray), axis=1)
     print(f'Weight vector for PS3-2 training data:\n{weight_vector}\n')
 
-    # Evaluate the model on the PS3-2 test set
+    # Evaluate the model on the PS3-2 test set and save the confusion matrix
     df_test = get_data(2, test=True)
     x_test = df_test[['x1', 'x2']].to_numpy()
     y_test = df_test[['y']].to_numpy().ravel()
     sklearn.metrics.ConfusionMatrixDisplay.from_estimator(clf, x_test, y_test)
     plt.title('Confusion Matrix for PS3-2 Test Set')
-    plt.show()
+    savefig('ps3_2_test_confusion.png')
+    plt.clf()
+
+    # Plot the PS3-2 test data and decision boundary
+    ax = sns.scatterplot(data=df_test, x='x1', y='x2', hue='y')
+    theta0 = weight_vector[0, 0]
+    theta1 = weight_vector[0, 1]
+    theta2 = weight_vector[0, 2]
+    x_decision = np.linspace(df_test['x1'].min(), df_test['x1'].max(), 50)
+    y_decision = np.asarray([-(theta0 + theta1*x)/theta2 for x in x_decision])
+    ax.plot(x_decision, y_decision, 'r')
+    plt.title('PS3-2 test data with decision boundary')
+    savefig('ps3_2_test_data_plot.png')
+    plt.clf()
 
 
 def main():
