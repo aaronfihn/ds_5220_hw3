@@ -72,7 +72,7 @@ def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegre
 
 def savefig(fname: str) -> None:
     save_path = Path(Path(__file__).parents[1], 'figures', fname)
-    print(f'Saving {save_path}\n')
+    print(f'Saving {save_path}')
     plt.savefig(save_path)
 
 
@@ -105,8 +105,8 @@ def prob_2a():
 
 
 def prob_2b():
-    print('----------\n')
-    print('Problem 2b\n')
+    print('----------')
+    print('Problem 2b')
 
     # get the PS3-2 dataset
     df_train = get_data(2, test=False)
@@ -120,7 +120,7 @@ def prob_2b():
     intercept_ndarray = clf.intercept_.reshape(1, -1)
     coef_ndarray = clf.coef_.reshape(1, -1)
     weight_vector = np.concatenate((intercept_ndarray, coef_ndarray), axis=1)
-    print(f'Weight vector for PS3-2 training data:\n{weight_vector}\n')
+    print(f'Weight vector for PS3-2 training data:\n{weight_vector}')
 
     # Evaluate the model on the PS3-2 test set and save the confusion matrix
     df_test = get_data(2, test=True)
@@ -145,8 +145,8 @@ def prob_2b():
 
 
 def prob_2c():
-    print('----------\n')
-    print('Problem 2c\n')
+    print('----------')
+    print('Problem 2c')
 
     # get the PS3-3 dataset
     df_train = get_data(3, test=False)
@@ -160,7 +160,7 @@ def prob_2c():
     intercept_ndarray = clf.intercept_.reshape(1, -1)
     coef_ndarray = clf.coef_.reshape(1, -1)
     weight_vector = np.concatenate((intercept_ndarray, coef_ndarray), axis=1)
-    print(f'Weight vector for PS3-3 training data:\n{weight_vector}\n')
+    print(f'Weight vector for PS3-3 training data:\n{weight_vector}')
 
     # Evaluate the model on the PS3-3 test set and save the confusion matrix
     df_test = get_data(3, test=True)
