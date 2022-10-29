@@ -43,7 +43,7 @@ def train_ridge_closed_form(alpha=1.0) -> np.ndarray:
     return theta
 
 
-def train_ridge_sgd(alpha=1.0) -> np.ndarray:
+def train_ridge_sgd(alpha=1.0, minibatch=10, n_epochs=1000) -> np.ndarray:
     """Fit the PS3-1 training dataset to a ridge regression using stochastic gradient descent."""
     # get the data from the csv file
     df_train = get_data(1, test=False)
@@ -51,12 +51,13 @@ def train_ridge_sgd(alpha=1.0) -> np.ndarray:
     train_y = df_train[['y']]
 
     # fit a model
-    ridge_model = Ridge(alpha=alpha, tol=1e-9, solver='cholesky', random_state=42)
-    ridge_model.fit(train_X, train_y)
+    clf = Ridge(alpha=alpha, tol=1e-9, solver='cholesky')
+    clf.fit(df_train[['x']], df_train[['y']])
 
-    # convert intercept and coefficients to an ndarray and return it
-    theta = np.asarray([[ridge_model.intercept_[0]], [ridge_model.coef_[0][0]]])
-    return theta
+    for epoch in range(n_epochs):
+        df_train = df_train.sample(frac=1, random_state=42)
+
+
 
 
 def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegression:
@@ -189,9 +190,7 @@ def main():
 
 
 def testing():
-    prob_2a()
-    prob_2b()
-    prob_2c()
+    train_ridge_sgd()
 
 
 if __name__ == '__main__':
