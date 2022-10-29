@@ -144,6 +144,46 @@ def prob_2b():
     plt.clf()
 
 
+def prob_2c():
+    print('----------\n')
+    print('Problem 2c\n')
+
+    # get the PS3-3 dataset
+    df_train = get_data(3, test=False)
+
+    # convert the responses and predictors to the format sklearn expects and get the fitted model
+    x_train = df_train[['x1', 'x2']].to_numpy()
+    y_train = df_train[['y']].to_numpy().ravel()
+    clf = train_logistic_regression(x_train, y_train)
+
+    # Find the weight vector for the PS3-3 training set
+    intercept_ndarray = clf.intercept_.reshape(1, -1)
+    coef_ndarray = clf.coef_.reshape(1, -1)
+    weight_vector = np.concatenate((intercept_ndarray, coef_ndarray), axis=1)
+    print(f'Weight vector for PS3-3 training data:\n{weight_vector}\n')
+
+    # Evaluate the model on the PS3-3 test set and save the confusion matrix
+    df_test = get_data(3, test=True)
+    x_test = df_test[['x1', 'x2']].to_numpy()
+    y_test = df_test[['y']].to_numpy().ravel()
+    sklearn.metrics.ConfusionMatrixDisplay.from_estimator(clf, x_test, y_test)
+    plt.title('Confusion Matrix for PS3-3 Test Set')
+    savefig('ps3_3_test_confusion.png')
+    plt.clf()
+
+    # Plot the PS3-3 test data and decision boundary
+    ax = sns.scatterplot(data=df_test, x='x1', y='x2', hue='y')
+    theta0 = weight_vector[0, 0]
+    theta1 = weight_vector[0, 1]
+    theta2 = weight_vector[0, 2]
+    x_decision = np.linspace(df_test['x1'].min(), df_test['x1'].max(), 50)
+    y_decision = np.asarray([-(theta0 + theta1 * x) / theta2 for x in x_decision])
+    ax.plot(x_decision, y_decision, 'r')
+    plt.title('PS3-3 test data with decision boundary')
+    savefig('ps3_3_test_data_plot.png')
+    plt.clf()
+
+
 def main():
     prob_1a()
 
@@ -151,6 +191,7 @@ def main():
 def testing():
     prob_2a()
     prob_2b()
+    prob_2c()
 
 
 if __name__ == '__main__':
