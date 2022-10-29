@@ -1,6 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pathlib import Path
+import sklearn.metrics
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LogisticRegression
 
@@ -56,16 +58,15 @@ def train_ridge_sgd(alpha=1.0) -> np.ndarray:
     return theta
 
 
-def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> np.ndarray:
+def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegression:
     """Fit data to a logistic regression model.
 
-    :param x: n-by-p matrix for predictors
+    :param x: n-by-p matrix for predictors.
     :param y: n-by-1 matrix for responses
-    :return: sklearn LogisticRegression modle
+    :return: sklearn LogisticRegression model
     """
-    clf = LogisticRegression(random_state=42).fit(x, y)
-    # fix return value
-
+    clf = LogisticRegression(penalty='none').fit(x, y)
+    return clf
 
 
 def prob_1a() -> None:
@@ -85,7 +86,40 @@ def prob_1a() -> None:
 
 
 def prob_2a():
+    s = '----------\n' \
+    'Problem 2a\n' \
+    'The function train_logistic_regression() takes two pandas DataFrames, one for predictors \n' \
+    'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
+    'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
+    'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
+    'the output I selected.)'
+    print(s)
 
+
+def prob_2b():
+    print('----------\n')
+    print('Problem 2b\n')
+    # get the PS3-2 dataset
+    df_train = get_data(2, test=False)
+
+    # convert the responses and predictors to the format sklearn expects and get the fitted model
+    x_train = df_train[['x1', 'x2']].to_numpy()
+    y_train = df_train[['y']].to_numpy().ravel()
+    clf = train_logistic_regression(x_train, y_train)
+
+    # Find the weight vector for the PS3-2 training set
+    intercept_ndarray = clf.intercept_.reshape(1, -1)
+    coef_ndarray = clf.coef_.reshape(1, -1)
+    weight_vector = np.concatenate((intercept_ndarray, coef_ndarray), axis=1)
+    print(f'Weight vector for PS3-2 training data:\n{weight_vector}\n')
+
+    # Evaluate the model on the PS3-2 test set
+    df_test = get_data(2, test=True)
+    x_test = df_test[['x1', 'x2']].to_numpy()
+    y_test = df_test[['y']].to_numpy().ravel()
+    sklearn.metrics.ConfusionMatrixDisplay.from_estimator(clf, x_test, y_test)
+    plt.title('Confusion Matrix for PS3-2 Test Set')
+    plt.show()
 
 
 def main():
@@ -93,7 +127,8 @@ def main():
 
 
 def testing():
-    prob_1a()
+    prob_2a()
+    prob_2b()
 
 
 if __name__ == '__main__':
