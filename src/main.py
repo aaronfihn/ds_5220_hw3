@@ -11,6 +11,13 @@ from sklearn.preprocessing import StandardScaler
 
 
 def get_data(dataset: int, /, test: bool = False) -> pd.DataFrame:
+    """Get the desired PS3 dataset.
+
+    :param dataset: An integer (1-3) specifying the dataset
+    :param test: False for training data, True for testing data
+    :return: The desired dataset
+    :rtype: pandas.DataFrame
+    """
     # Get the data directory pathname
     data_dir_pname = Path(Path(__file__).parents[1], 'data')
 
@@ -27,7 +34,8 @@ def train_ridge_closed_form(alpha=1.0) -> np.ndarray:
     """Fit the PS3-1 training dataset to a ridge regression for a specified regularization constant.
 
     :param alpha: the regularization constant
-    :return: A (2, 1) ndarray of fitted regression coefficients
+    :return: A (2, 1) array of fitted regression coefficients
+    :rtype: numpy.ndarray
     """
     # get the data from the csv file
     df_train = get_data(1, test=False)
@@ -45,8 +53,15 @@ def train_ridge_closed_form(alpha=1.0) -> np.ndarray:
     return theta
 
 
-def train_ridge_sgd(alpha=1.0, minibatch=10, n_epochs=1000) -> np.ndarray:
-    """Fit the PS3-1 training dataset to a ridge regression using stochastic gradient descent."""
+def train_ridge_sgd(alpha=1.0, m=10, n_epochs=1000) -> np.ndarray:
+    """Fit the PS3-1 training dataset to a ridge regression using stochastic gradient descent.
+
+    :param alpha: the regularization constant
+    :param m: the minibatch size
+    :param n_epochs: the number of epochs to perform
+    :return: A (2,1) array of fitted regression coefficients
+    :rtype: numpy.ndarray
+    """
     # get the data from the csv file
     df_train = get_data(1, test=False)
     train_X = df_train[['x']]
@@ -67,7 +82,8 @@ def train_ridge_sgd(alpha=1.0, minibatch=10, n_epochs=1000) -> np.ndarray:
 
         while samples_used < n:
             first_sample = samples_used
-            last_sample = first_sample + min(minibatch, n - first_sample)
+            last_sample = first_sample + min(m, n - first_sample)
+            # Just got to here before running out of time
 
 
 def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegression:
@@ -75,13 +91,18 @@ def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegre
 
     :param x: n-by-p matrix for predictors.
     :param y: n-by-1 matrix for responses
-    :return: sklearn LogisticRegression model
+    :return: A fitted LogisticRegression model
+    :rtype: sklearn.linear_model.LogisticRegression
     """
     clf = LogisticRegression(penalty='none').fit(x, y)
     return clf
 
 
 def savefig(fname: str) -> None:
+    """Save the current matplotlib plot.
+
+    :param fname: The filename, including path and extension.
+    """
     save_path = Path(Path(__file__).parents[1], 'figures', fname)
     print(f'Saving {save_path}')
     plt.savefig(save_path)
@@ -114,6 +135,7 @@ def prob_1b() -> None:
 
 
 def prob_2a():
+    """The solution to problem 2a."""
     s = \
         '----------\n' \
         'Problem 2a\n' \
@@ -121,11 +143,12 @@ def prob_2a():
         'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
         'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
         'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
-       'the output I selected.)'
+        'the output I selected.)'
     print(s)
 
 
 def prob_2b():
+    """The solution to problem 2b."""
     print('----------')
     print('Problem 2b')
 
@@ -166,6 +189,7 @@ def prob_2b():
 
 
 def prob_2c():
+    """The solution to problem 2c."""
     print('----------')
     print('Problem 2c')
 
@@ -206,6 +230,7 @@ def prob_2c():
 
 
 def main():
+    """Run all subproblems."""
     prob_1a()
     prob_1b()
     prob_2a()
