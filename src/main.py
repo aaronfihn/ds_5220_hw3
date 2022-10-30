@@ -213,10 +213,5 @@ def main():
     prob_2c()
 
 
-def testing():
-    prob_1a()
-    prob_1b()
-
-
 if __name__ == '__main__':
     main()
