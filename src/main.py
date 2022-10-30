@@ -4,8 +4,10 @@ import pandas as pd
 import seaborn as sns
 import sklearn.metrics
 from pathlib import Path
-from sklearn.linear_model import Ridge
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 
 def get_data(dataset: int, /, test: bool = False) -> pd.DataFrame:
@@ -49,15 +51,23 @@ def train_ridge_sgd(alpha=1.0, minibatch=10, n_epochs=1000) -> np.ndarray:
     df_train = get_data(1, test=False)
     train_X = df_train[['x']]
     train_y = df_train[['y']]
+    n = train_X.shape[0]
 
-    # fit a model
-    clf = Ridge(alpha=alpha, tol=1e-9, solver='cholesky')
-    clf.fit(df_train[['x']], df_train[['y']])
+    # Scikit-learn has a Ridge class, but no way to use it with mini-batch stochastic gradient descent. Instead,
+    # the SGDRegressor class with a squared error loss function and L2 penalty is equivalent to ridge regression.
+    # (See the third paragraph at https://scikit-learn.org/stable/modules/sgd.html.)
+    reg = SGDRegressor(loss='squared_error', penalty='l2')
+    pipeline = make_pipeline(StandardScaler(), reg)
 
+    # perform the specified number of epochs
     for epoch in range(n_epochs):
+        # shuffle the data
         df_train = df_train.sample(frac=1, random_state=42)
+        samples_used = 0
 
-
+        while samples_used < n:
+            first_sample = samples_used
+            last_sample = first_sample + min(minibatch, n - first_sample)
 
 
 def train_logistic_regression(x: pd.DataFrame, y: pd.DataFrame) -> LogisticRegression:
@@ -85,23 +95,33 @@ def prob_1a() -> None:
         'constant is train_ridge_closed_form().\n' \
         'Example coefficients for alpha=1.0, closed-form:\n' \
         + str(train_ridge_closed_form(alpha=1.0)) + '\n' \
-        '\n'\
-        'The stochastic gradient descent solution is train_ridge_sgd().\n'\
-        'Example coefficients for alpha=1.0, SGD:\n'\
-        + str(train_ridge_sgd(alpha=1.0))
-    #  UNFINISHED UNFINISHED UNFINISHED, CAN WE DO SGD IN SKLEARN?
+        '\n' \
+        'The stochastic gradient descent solution is train_ridge_sgd(),\n' \
+        'which is incomplete. I initially used the sklearn Ridge class,\n' \
+        'which supports SGD but not minibatch SGD. Given more time, I\n' \
+        'would use the sklearn class SGDRegressor, which can handle \n' \
+        'minibatch SGD using the partial_fit function.'
+    print(s)
+
+
+def prob_1b() -> None:
+    """The solution to problem 1b."""
+    s = \
+        '----------\n' \
+        'Problem 1b\n' \
+        'I was unable to complete this problem on time due to scheduling.'
     print(s)
 
 
 def prob_2a():
-    s = '' \
-      '----------\n' \
-      'Problem 2a\n' \
-      'The function train_logistic_regression() takes two pandas DataFrames, one for predictors \n' \
-      'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
-      'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
-      'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
-      'the output I selected.)'
+    s = \
+        '----------\n' \
+        'Problem 2a\n' \
+        'The function train_logistic_regression() takes two pandas DataFrames, one for predictors \n' \
+        'and one for response, and uses them to train a logistic regression model. It outputs a \n' \
+        'LogisticRegression class from the sklearn library. (I convert this into a weight vector in \n' \
+        'problem 2b manually, as it is much easier to evaluate the model against the test data with \n' \
+       'the output I selected.)'
     print(s)
 
 
@@ -187,11 +207,16 @@ def prob_2c():
 
 def main():
     prob_1a()
+    prob_1b()
+    prob_2a()
+    prob_2b()
+    prob_2c()
 
 
 def testing():
-    train_ridge_sgd()
+    prob_1a()
+    prob_1b()
 
 
 if __name__ == '__main__':
-    testing()
+    main()
